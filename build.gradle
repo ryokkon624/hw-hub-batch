@@ -1,0 +1,102 @@
+plugins {
+    id 'java'
+    id 'groovy'
+    id 'org.springframework.boot' version '3.5.7'
+    id 'io.spring.dependency-management' version '1.1.7'
+    id 'jacoco'
+    id 'com.diffplug.spotless' version '6.25.0'
+}
+
+group = 'com.hwhub'
+version = '0.0.1-SNAPSHOT'
+description = 'hw-hub-batch'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+
+    mybatisGenerator
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.boot:spring-boot-starter-batch'
+    implementation 'org.springframework.boot:spring-boot-starter-jdbc'
+
+    compileOnly 'org.projectlombok:lombok'
+    runtimeOnly 'com.mysql:mysql-connector-j:9.5.0'
+
+    // MyBatis
+    implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.5'
+    mybatisGenerator 'com.mysql:mysql-connector-j:9.5.0'
+    mybatisGenerator 'org.mybatis.generator:mybatis-generator-core:1.4.2'
+
+    annotationProcessor 'org.projectlombok:lombok'
+
+    // テスト系
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.batch:spring-batch-test'
+    testImplementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter-test:3.0.5'
+
+    // Spock（Groovy 4 用）
+    testImplementation platform('org.spockframework:spock-bom:2.3-groovy-4.0')
+    testImplementation 'org.spockframework:spock-core'
+    testImplementation 'org.spockframework:spock-spring'
+
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+    finalizedBy jacocoTestReport
+}
+
+tasks.register('mybatisGenerator', JavaExec) {
+    group = 'mybatis'
+    description = 'Run MyBatis Generator'
+
+    classpath = configurations.mybatisGenerator
+    mainClass = 'org.mybatis.generator.api.ShellRunner'
+
+    args = [
+            '-configfile', 'src/main/resources/generator/generatorConfig.xml',
+            '-overwrite'
+    ]
+}
+
+jacoco {
+    toolVersion = "0.8.12"
+}
+
+jacocoTestReport {
+    dependsOn test
+
+    reports {
+        xml.required = true
+        csv.required = false
+        html.required = true
+        html.outputLocation = layout.buildDirectory.dir('reports/jacoco/test/html')
+    }
+}
+
+spotless {
+    java {
+        // 例: Google Java Format を使用
+        googleJavaFormat('1.32.0')
+        // IDEの保存時のフォーマットが競合しないように、不要な設定は避ける
+        // trimTrailingWhitespace()
+        // endWithNewline()
+    }
+    // 他の言語（Kotlin, Groovy, XML, YAMLなど）もここで設定可能
+}

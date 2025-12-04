@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hwhub.batch.infrastructure.mybatis.custom.mapper.HouseholdInvitationCustomMapper">
+
+    <update id="expirePendingInvitations">
+        UPDATE t_household_invitation
+        SET
+        status = #{expiredStatus}
+        , update_user_id = #{updateUserId}
+        , update_program = #{updateProgram}
+        WHERE
+        status = #{pendingStatus}
+        AND expires_at IS NOT NULL
+        AND expires_at &lt; now()
+    </update>
+
+</mapper>

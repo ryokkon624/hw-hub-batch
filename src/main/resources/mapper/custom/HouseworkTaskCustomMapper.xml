@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hwhub.batch.infrastructure.mybatis.custom.mapper.HouseworkTaskCustomMapper">
+
+    <!-- 既存タスクの日付だけ取得 -->
+    <select id="selectExistingTaskDates" resultType="java.time.LocalDate">
+        SELECT
+        target_date
+        FROM
+        t_housework_task
+        WHERE
+        housework_id = #{houseworkId}
+        AND target_date >= #{fromDate}
+    </select>
+
+    <!-- 一括 INSERT -->
+    <insert id="bulkInsertTasks">
+        INSERT INTO t_housework_task (
+        household_id,
+        housework_id,
+        name,
+        description,
+        category,
+        target_date,
+        assignee_user_id,
+        status,
+        assign_reason_type,
+        done_at,
+        skipped_reason,
+        create_user_id,
+        create_program,
+        update_user_id,
+        update_program
+        )
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (
+            #{item.householdId},
+            #{item.houseworkId},
+            #{item.name},
+            #{item.description},
+            #{item.category},
+            #{item.targetDate},
+            #{item.assigneeUserId},
+            #{item.statusCode},
+            #{item.assignReasonType},
+            NULL,        -- done_at
+            NULL,        -- skipped_reason
+            #{item.createUserId},
+            #{item.createProgram},
+            #{item.updateUserId},
+            #{item.updateProgram}
+            )
+        </foreach>
+    </insert>
+
+    <!-- 不要になった日付の「未対応タスク」を削除 -->
+    <delete id="deleteUndoneTasksByDates">
+        DELETE FROM t_housework_task
+        WHERE
+        housework_id = #{houseworkId}
+        AND status = '0'
+        AND target_date IN
+        <foreach collection="dates" item="d" open="(" separator="," close=")">
+            #{d}
+        </foreach>
+    </delete>
+
+    <!-- スナップショット更新 -->
+    <update id="updateTaskSnapshot">
+        UPDATE t_housework_task
+        SET
+        name                  = #{name},
+        description           = #{description},
+        category              = #{category},
+        update_user_id        = #{userId},
+        update_program        = #{program}
+        WHERE
+        housework_id = #{houseworkId}
+        AND target_date &gt;= #{fromDate}
+    </update>
+
+    <!-- default 担当の追随（未対応＆システム割当だけ） -->
+    <update id="updateAssigneeForSystemAssigned">
+        UPDATE t_housework_task
+        SET
+        assignee_user_id = #{assigneeUserId},
+        update_user_id   = #{userId},
+        update_program   = #{program}
+        WHERE
+        housework_id = #{houseworkId}
+        AND target_date >= #{fromDate}
+        AND status = '0'
+        AND assign_reason_type = '9'
+    </update>
+
+</mapper>
