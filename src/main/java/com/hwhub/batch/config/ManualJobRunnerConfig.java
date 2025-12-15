@@ -25,14 +25,14 @@ public class ManualJobRunnerConfig {
       public void run(ApplicationArguments args) throws Exception {
 
         // --- 起動引数から job 名を取得 ---
-        String jobName =
-            Optional.ofNullable(args.getOptionValues("spring.batch.job.name"))
-                .filter(list -> !list.isEmpty())
-                .map(list -> list.get(0))
-                .orElseThrow(
-                    () ->
-                        new IllegalArgumentException(
-                            "spring.batch.job.name is required. (e.g. --spring.batch.job.name=invitationExpireJob)"));
+        List<String> optionValues = args.getOptionValues("spring.batch.job.name");
+        if (optionValues == null || optionValues.isEmpty()) {
+          log.info(
+              "No 'spring.batch.job.name' specified. ManualJobRunner will not launch any job.(e.g. --spring.batch.job.name=invitationExpireJob)");
+          return;
+        }
+
+        String jobName = optionValues.getFirst();
 
         // --- 登録されている Job の中から該当 Job を探す ---
         Job job =
