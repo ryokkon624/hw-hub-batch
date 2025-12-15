@@ -88,6 +88,18 @@ jacocoTestReport {
         html.required = true
         html.outputLocation = layout.buildDirectory.dir('reports/jacoco/test/html')
     }
+
+    afterEvaluate {
+        classDirectories.setFrom(
+                files(classDirectories.files.collect { dir ->
+                    fileTree(dir: dir, exclude: [
+                            'com/hwhub/batch/infrastructure/mybatis/generated/entity/**',
+                            'com/hwhub/batch/infrastructure/mybatis/repository/**',
+                            'com/hwhub/batch/domain/enums/**',
+                    ])
+                })
+        )
+    }
 }
 
 spotless {
