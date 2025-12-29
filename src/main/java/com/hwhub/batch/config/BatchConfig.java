@@ -6,5 +6,5 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @EnableBatchProcessing
 public class BatchConfig {
-    // 共通のBatch設定を後でここに追加
+  // 共通のBatch設定を後でここに追加
 }
