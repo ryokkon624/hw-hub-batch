@@ -24,7 +24,7 @@ jobs:
       - name: Configure AWS credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: arn:aws:iam::564323392873:role/<あなたのbatch用OIDCロール名>
+          role-to-assume: arn:aws:iam::564323392873:role/gh-actions-hwhub-batch-stg
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Login to ECR
