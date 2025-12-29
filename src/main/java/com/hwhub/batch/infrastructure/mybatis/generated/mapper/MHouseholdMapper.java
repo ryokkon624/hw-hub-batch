@@ -2,21 +2,20 @@ package com.hwhub.batch.infrastructure.mybatis.generated.mapper;
 
 import com.hwhub.batch.infrastructure.mybatis.generated.entity.MHousehold;
 import com.hwhub.batch.infrastructure.mybatis.generated.entity.MHouseholdExample;
-
 import java.util.List;
 
 public interface MHouseholdMapper {
-    int deleteByPrimaryKey(Long householdId);
+  int deleteByPrimaryKey(Long householdId);
 
-    int insert(MHousehold row);
+  int insert(MHousehold row);
 
-    int insertSelective(MHousehold row);
+  int insertSelective(MHousehold row);
 
-    List<MHousehold> selectByExample(MHouseholdExample example);
+  List<MHousehold> selectByExample(MHouseholdExample example);
 
-    MHousehold selectByPrimaryKey(Long householdId);
+  MHousehold selectByPrimaryKey(Long householdId);
 
-    int updateByPrimaryKeySelective(MHousehold row);
+  int updateByPrimaryKeySelective(MHousehold row);
 
-    int updateByPrimaryKey(MHousehold row);
+  int updateByPrimaryKey(MHousehold row);
 }

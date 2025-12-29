@@ -1,0 +1,107 @@
+name: deploy-batch-stg
+
+on:
+  push:
+    branches: [ "main" ]
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  AWS_REGION: ap-northeast-1
+  AWS_ACCOUNT_ID: "564323392873"
+  ECR_REPOSITORY: hwhub-batch
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::564323392873:role/<あなたのbatch用OIDCロール名>
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to ECR
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build JAR
+        uses: gradle/actions/setup-gradle@v4
+      - run: ./gradlew clean build -x test
+
+      - name: Build & Push Docker image
+        run: |
+          IMAGE_TAG_SHA=stg-${GITHUB_SHA}
+          IMAGE_URI_SHA=${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:${IMAGE_TAG_SHA}
+          IMAGE_URI_LATEST=${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:stg-latest
+
+          docker build -t "${IMAGE_URI_SHA}" -t "${IMAGE_URI_LATEST}" .
+          docker push "${IMAGE_URI_SHA}"
+          docker push "${IMAGE_URI_LATEST}"
+
+          echo "Pushed: ${IMAGE_URI_SHA}"
+          echo "Pushed: ${IMAGE_URI_LATEST}"
+
+      - name: Register new task definition revision (replace image)
+        id: taskdef
+        run: |
+          IMAGE_URI_LATEST=${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:stg-latest
+
+          # 既存 taskdef を取得
+          aws ecs describe-task-definition \
+            --task-definition hwhub-batch-stg \
+            --query taskDefinition > taskdef.json
+
+          # imageだけ置換して登録（jq 必要）
+          sudo apt-get update && sudo apt-get install -y jq
+
+          NEW_TASKDEF=$(jq \
+            --arg IMAGE "${IMAGE_URI_LATEST}" \
+            'del(
+              .taskDefinitionArn,
+              .revision,
+              .status,
+              .requiresAttributes,
+              .compatibilities,
+              .registeredAt,
+              .registeredBy
+            )
+            | .containerDefinitions[0].image=$IMAGE
+            ' taskdef.json)
+
+          echo "${NEW_TASKDEF}" > taskdef.new.json
+
+          # 新 revision 登録
+          ARN=$(aws ecs register-task-definition \
+            --cli-input-json file://taskdef.new.json \
+            --query 'taskDefinition.taskDefinitionArn' \
+            --output text)
+
+          echo "taskdef_arn=${ARN}" >> $GITHUB_OUTPUT
+          echo "Registered: ${ARN}"
+
+      - name: Update schedules to use new task definition revision
+        run: |
+          TD_ARN="${{ steps.taskdef.outputs.taskdef_arn }}"
+
+          # schedule一覧（3つ）を更新
+          for NAME in \
+            "hwhub-batch-stg-invitation-expire-daily-0100-jst" \
+            "hwhub-batch-stg-housework-generate-daily-0300-jst" \
+            "hwhub-batch-stg-housework-recalc-hourly"
+          do
+            echo "Updating ${NAME}..."
+            # 既存 schedule を取得して、Target.EcsParameters.TaskDefinitionArn だけ差し替えて Update
+            aws scheduler get-schedule --name "${NAME}" > sched.json
+
+            sudo apt-get install -y jq >/dev/null 2>&1 || true
+            jq --arg TD "${TD_ARN}" '.Target.EcsParameters.TaskDefinitionArn=$TD' sched.json > sched.new.json
+
+            aws scheduler update-schedule \
+              --cli-input-json file://sched.new.json
+          done
