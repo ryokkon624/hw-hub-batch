@@ -98,21 +98,26 @@ jobs:
 
       - name: Update schedules to use new task definition revision
         run: |
-          TD_ARN="${{ steps.taskdef.outputs.taskdef_arn }}"
-
-          # schedule一覧（3つ）を更新
+          TD_ARN="arn:aws:ecs:ap-northeast-1:${AWS_ACCOUNT_ID}:task-definition/hwhub-batch-stg:${NEW_REV}"
+          
+          sudo apt-get update -y >/dev/null
+          sudo apt-get install -y jq >/dev/null
+          
           for NAME in \
-            "hwhub-batch-stg-invitation-expire-daily-0100-jst" \
-            "hwhub-batch-stg-housework-generate-daily-0300-jst" \
-            "hwhub-batch-stg-housework-recalc-hourly"
+          "hwhub-batch-stg-invitation-expire-daily-0100-jst" \
+          "hwhub-batch-stg-housework-generate-daily-0300-jst" \
+          "hwhub-batch-stg-housework-recalc-hourly"
           do
             echo "Updating ${NAME}..."
-            # 既存 schedule を取得して、Target.EcsParameters.TaskDefinitionArn だけ差し替えて Update
+          
             aws scheduler get-schedule --name "${NAME}" > sched.json
-
-            sudo apt-get install -y jq >/dev/null 2>&1 || true
-            jq --arg TD "${TD_ARN}" '.Target.EcsParameters.TaskDefinitionArn=$TD' sched.json > sched.new.json
-
-            aws scheduler update-schedule \
-              --cli-input-json file://sched.new.json
+          
+            # update-schedule に不要なレスポンス要素を落として、TaskDefinitionArn だけ差し替える
+            jq --arg TD "${TD_ARN}" '
+            del(.Arn, .CreationDate, .LastModificationDate, .State, .ResponseMetadata) |
+            .Target.EcsParameters.TaskDefinitionArn = $TD
+            ' sched.json > sched.new.json
+          
+            aws scheduler update-schedule --name "${NAME}" --cli-input-json file://sched.new.json
           done
+
