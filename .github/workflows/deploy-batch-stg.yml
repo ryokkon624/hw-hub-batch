@@ -32,8 +32,13 @@ jobs:
 
       - name: Build JAR
         uses: gradle/actions/setup-gradle@v4
-      - run: ./gradlew clean build -x test
 
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
+
+      - name: Build JAR
+        run: ./gradlew clean build -x test
+        
       - name: Build & Push Docker image
         run: |
           IMAGE_TAG_SHA=stg-${GITHUB_SHA}
