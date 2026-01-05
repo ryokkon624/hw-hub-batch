@@ -37,6 +37,9 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x ./gradlew
 
+      - name: Force IPv4 (workaround)
+        run: echo "JAVA_TOOL_OPTIONS=-Djava.net.preferIPv4Stack=true" >> $GITHUB_ENV
+
       - name: Run tests & generate JaCoCo report
         run: ./gradlew test jacocoTestReport -x spotlessCheck
 
