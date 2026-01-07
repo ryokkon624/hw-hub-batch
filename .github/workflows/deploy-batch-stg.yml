@@ -45,6 +45,12 @@ jobs:
       - name: Build JAR
         run: ./gradlew clean bootJar -x test
 
+      - name: Normalize jar name
+        run: |
+          ls -la build/libs
+          JAR=$(ls build/libs/*-SNAPSHOT.jar | grep -v -- '-plain\.jar$' | head -n 1)
+          cp "$JAR" build/libs/app.jar
+
       - name: Build & Push Docker image
         run: |
           IMAGE_TAG_SHA=stg-${GITHUB_SHA}
