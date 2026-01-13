@@ -47,11 +47,11 @@ src/main/java/com/hwhub/batch
     └── mybatis/
         ├── converter/     # Entity ⇔ Domain Modelの変換
         ├── generated/     # MBG自動生成（※編集禁止）
-        │   ├── entity/    
-        │   └── mapper/    
+        │   ├── entity/
+        │   └── mapper/
         ├── custom/        # 手書きEntity/Mapper（JOIN用など）
-        │   ├── entity/    
-        │   └── mapper/    
+        │   ├── entity/
+        │   └── mapper/
         └── repository/    # リポジトリ実装
 ```
 
@@ -77,6 +77,7 @@ src/main/java/com/hwhub/batch
 ./gradlew bootRun --args='--spring.batch.job.name=invitationExpireJob'
 ./gradlew bootRun --args='--spring.batch.job.name=houseworkTaskGenerateJob'
 ./gradlew bootRun --args='--spring.batch.job.name=houseworkTaskRecalcJob'
+./gradlew bootRun --args='--spring.batch.job.name=householdCleanupJob'
 ```
 
 ---
@@ -86,6 +87,7 @@ src/main/java/com/hwhub/batch
 - invitationExpireJob：招待の期限切れ処理
 - houseworkTaskGenerateJob：家事タスクの定期生成
 - houseworkTaskRecalcJob：家事タスクの再計算
+- householdCleanupJob：世帯の削除
 
 ---
 
@@ -110,9 +112,9 @@ build/reports/jacoco/test/html/index.html
 ## CI（GitHub Actions）
 
 - main ブランチ push 時：
-    - テスト実行
-    - JaCoCo カバレッジ計測
-    - GitHub Pages にレポート公開
+  - テスト実行
+  - JaCoCo カバレッジ計測
+  - GitHub Pages にレポート公開
 
 ---
 
@@ -126,7 +128,7 @@ build/reports/jacoco/test/html/index.html
 
 ## EventBridge Scheduler での実行方式
 
-1つの TaskDefinition を使い、Scheduler 側で：
+1 つの TaskDefinition を使い、Scheduler 側で：
 
 - Container override.command
 
@@ -138,11 +140,11 @@ build/reports/jacoco/test/html/index.html
 
 1. main ブランチに push
 2. GitHub Actions が：
-    - build
-    - test
-    - docker build & push
-    - ECS タスク定義更新
-    - EventBridge Scheduler の TaskDefinition 更新
+   - build
+   - test
+   - docker build & push
+   - ECS タスク定義更新
+   - EventBridge Scheduler の TaskDefinition 更新
 
 ---
 
@@ -160,4 +162,3 @@ build/reports/jacoco/test/html/index.html
 - 途中失敗時に再実行しても問題ない設計にすること
 
 ---
-
