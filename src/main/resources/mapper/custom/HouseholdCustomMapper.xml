@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hwhub.batch.infrastructure.mybatis.custom.mapper.HouseholdCustomMapper">
+
+    <sql id="OrphanedHouseholdCondition"> WHERE h.updated_at &lt; DATE_SUB(NOW(), INTERVAL 1 MONTH)
+        AND NOT EXISTS ( SELECT 1 FROM m_household_member m WHERE m.household_id = h.household_id ) </sql>
+
+    <!-- 担当変更履歴 -->
+    <delete id="deleteOrphanedAssignmentHistory"> DELETE hist FROM
+        t_housework_task_assignment_history hist INNER JOIN m_household h ON hist.household_id =
+        h.household_id <include refid="OrphanedHouseholdCondition" />
+    </delete>
+
+    <!-- 家事タスク -->
+    <delete id="deleteOrphanedHouseworkTasks"> DELETE t FROM t_housework_task t INNER JOIN
+        m_household h ON t.household_id = h.household_id <include refid="OrphanedHouseholdCondition" />
+    </delete>
+
+    <!-- 再計算リクエスト -->
+    <delete id="deleteOrphanedRecalcRequests"> DELETE r FROM t_housework_task_recalc_request r INNER
+        JOIN m_housework hw ON r.housework_id = hw.housework_id INNER JOIN m_household h ON
+        hw.household_id = h.household_id <include refid="OrphanedHouseholdCondition" />
+    </delete>
+
+    <!-- 家事 -->
+    <delete id="deleteOrphanedHouseworks"> DELETE hw FROM m_housework hw INNER JOIN m_household h ON
+        hw.household_id = h.household_id <include refid="OrphanedHouseholdCondition" />
+    </delete>
+
+    <!-- 買い物添付ファイル -->
+    <delete id="deleteOrphanedShoppingItemAttachments"> DELETE a FROM t_shopping_item_attachment a
+        INNER JOIN t_shopping_item i ON a.shopping_item_id = i.shopping_item_id INNER JOIN
+        m_household h ON i.household_id = h.household_id <include refid="OrphanedHouseholdCondition" />
+    </delete>
+
+    <!-- 買い物アイテム -->
+    <delete id="deleteOrphanedShoppingItems"> DELETE i FROM t_shopping_item i INNER JOIN m_household
+        h ON i.household_id = h.household_id <include refid="OrphanedHouseholdCondition" />
+    </delete>
+
+    <!-- 招待 -->
+    <delete id="deleteOrphanedInvitations"> DELETE inv FROM t_household_invitation inv INNER JOIN
+        m_household h ON inv.household_id = h.household_id <include
+            refid="OrphanedHouseholdCondition" />
+    </delete>
+
+    <!-- 世帯本体 -->
+    <delete id="deleteOrphanedHouseholds"> DELETE h FROM m_household h <include
+            refid="OrphanedHouseholdCondition" />
+    </delete>
+</mapper>
