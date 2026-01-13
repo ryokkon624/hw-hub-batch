@@ -18,27 +18,27 @@ import org.springframework.transaction.PlatformTransactionManager;
 @Slf4j
 public class HouseholdCleanupJobConfig {
 
-    public static final String JOB_NAME = "householdCleanupJob";
-    public static final String STEP_NAME = "householdCleanupStep";
+  public static final String JOB_NAME = "householdCleanupJob";
+  public static final String STEP_NAME = "householdCleanupStep";
 
-    private final JobRepository jobRepository;
-    private final PlatformTransactionManager transactionManager;
-    private final HouseholdCleanupService service;
+  private final JobRepository jobRepository;
+  private final PlatformTransactionManager transactionManager;
+  private final HouseholdCleanupService service;
 
-    @Bean
-    public Job householdCleanupJob() {
-        return new JobBuilder(JOB_NAME, jobRepository).start(householdCleanupStep()).build();
-    }
+  @Bean
+  public Job householdCleanupJob() {
+    return new JobBuilder(JOB_NAME, jobRepository).start(householdCleanupStep()).build();
+  }
 
-    @Bean
-    public Step householdCleanupStep() {
-        return new StepBuilder(STEP_NAME, jobRepository)
-                .tasklet(
-                        (contribution, chunkContext) -> {
-                            service.cleanupHouseholds();
-                            return RepeatStatus.FINISHED;
-                        },
-                        transactionManager)
-                .build();
-    }
+  @Bean
+  public Step householdCleanupStep() {
+    return new StepBuilder(STEP_NAME, jobRepository)
+        .tasklet(
+            (contribution, chunkContext) -> {
+              service.cleanupHouseholds();
+              return RepeatStatus.FINISHED;
+            },
+            transactionManager)
+        .build();
+  }
 }

@@ -9,20 +9,20 @@ import org.springframework.stereotype.Repository;
 @RequiredArgsConstructor
 public class MyBatisHouseholdRepository implements HouseholdRepository {
 
-    private final HouseholdCustomMapper customMapper;
+  private final HouseholdCustomMapper customMapper;
 
-    @Override
-    public int deleteOrphanedHouseholds(Long userId, String program) {
-        // 依存関係のある子テーブルから順に削除
-        customMapper.deleteOrphanedAssignmentHistory();
-        customMapper.deleteOrphanedRecalcRequests();
-        customMapper.deleteOrphanedHouseworkTasks();
-        customMapper.deleteOrphanedHouseworks();
-        customMapper.deleteOrphanedShoppingItemAttachments();
-        customMapper.deleteOrphanedShoppingItems();
-        customMapper.deleteOrphanedInvitations();
+  @Override
+  public int deleteOrphanedHouseholds(Long userId, String program) {
+    // 依存関係のある子テーブルから順に削除
+    customMapper.deleteOrphanedAssignmentHistory();
+    customMapper.deleteOrphanedRecalcRequests();
+    customMapper.deleteOrphanedHouseworkTasks();
+    customMapper.deleteOrphanedHouseworks();
+    customMapper.deleteOrphanedShoppingItemAttachments();
+    customMapper.deleteOrphanedShoppingItems();
+    customMapper.deleteOrphanedInvitations();
 
-        // 最後に親(m_household)を削除
-        return customMapper.deleteOrphanedHouseholds();
-    }
+    // 最後に親(m_household)を削除
+    return customMapper.deleteOrphanedHouseholds();
+  }
 }
