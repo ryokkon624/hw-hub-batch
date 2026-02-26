@@ -1,7 +1,11 @@
 package com.hwhub.batch.infrastructure.mybatis.repository;
 
+import com.hwhub.batch.domain.model.HouseholdModel;
 import com.hwhub.batch.domain.repository.HouseholdRepository;
+import com.hwhub.batch.infrastructure.mybatis.converter.HouseholdConverter;
 import com.hwhub.batch.infrastructure.mybatis.custom.mapper.HouseholdCustomMapper;
+import com.hwhub.batch.infrastructure.mybatis.generated.entity.MHousehold;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -24,5 +28,11 @@ public class MyBatisHouseholdRepository implements HouseholdRepository {
 
     // 最後に親(m_household)を削除
     return customMapper.deleteOrphanedHouseholds();
+  }
+
+  @Override
+  public List<HouseholdModel> findByIds(List<Long> householdIds) {
+    List<MHousehold> entities = customMapper.findByIds(householdIds);
+    return entities.stream().map(HouseholdConverter::toModel).toList();
   }
 }

@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hwhub.batch.infrastructure.mybatis.custom.mapper.NotificationEventCustomMapper">
+
+  <!-- ====== claimPendingEvents ====== -->
+  <update id="claimPendingEvents">
+    UPDATE t_notification_event
+    SET
+      event_status = '1',
+      processing_key = #{processingKey},
+      processing_started_at = now(6),
+      update_user_id = #{updateUserId},
+      update_program = #{updateProgram}
+    WHERE event_status = '0'
+      AND processing_key IS NULL
+    ORDER BY occurred_at ASC, notification_event_id ASC
+    LIMIT #{limit}
+  </update>
+
+  <!-- ====== aggregateLatestTaskAssignmentEvents ======
+       - task_idごとに最新だけ採用
+       - その後、target/type/date/actor で集約
+    -->
+  <select id="aggregateLatestTaskAssignmentEvents" resultType="com.hwhub.batch.infrastructure.mybatis.custom.entity.NotificationEventAggregationRow">
+    WITH latest_per_task AS ( 
+        SELECT
+            e.notification_event_id
+            , e.household_id
+            , e.notification_type
+            , e.actor_user_id
+            , e.target_user_id
+            , e.entity_id
+            , e.aggregation_date
+            , e.occurred_at
+            , row_number() OVER ( 
+                PARTITION BY
+                    e.entity_id 
+                ORDER BY
+                    e.occurred_at DESC
+                    , e.notification_event_id DESC
+            ) AS rn 
+        FROM
+            t_notification_event e 
+        WHERE
+            e.event_status = '1' 
+            AND e.processing_key = #{processingKey}
+    ) 
+    , picked AS (SELECT * FROM latest_per_task WHERE rn = 1)
+    , latest_in_group AS ( 
+        SELECT
+            p.*
+            , row_number() OVER ( 
+                PARTITION BY
+                    p.target_user_id
+                    , p.notification_type
+                    , p.aggregation_date
+                    , p.actor_user_id 
+                ORDER BY
+                    p.occurred_at DESC
+                    , p.notification_event_id DESC
+            ) AS grp_rn 
+        FROM
+            picked p
+    ) 
+    SELECT
+        max(CASE WHEN g.grp_rn = 1 THEN g.household_id END) AS householdid
+        , g.notification_type AS notificationtype
+        , g.actor_user_id AS actoruserid
+        , g.target_user_id AS targetuserid
+        , max(g.occurred_at) AS latestoccurredat
+        , count(*) AS taskcount
+        , g.aggregation_date AS aggregationdate
+        , max( 
+            CASE 
+                WHEN g.grp_rn = 1 
+                    THEN g.entity_id 
+                END
+        ) AS latesthouseworktaskid 
+    FROM
+        latest_in_group g 
+    GROUP BY
+        g.target_user_id
+        , g.notification_type
+        , g.aggregation_date
+        , g.actor_user_id 
+    ORDER BY
+        latestoccurredat DESC
+  </select>
+
+  <!-- ====== markProcessingAsDone ====== -->
+  <update id="markProcessingAsDone">
+    UPDATE t_notification_event
+    SET
+      event_status = '2',
+      processed_at = now(6),
+      update_user_id = #{updateUserId},
+      update_program = #{updateProgram}
+    WHERE event_status = '1'
+      AND processing_key = #{processingKey}
+  </update>
+
+</mapper>

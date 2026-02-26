@@ -23,6 +23,6 @@ public enum TaskRecalcStatus implements CodeEnum {
         return v;
       }
     }
-    throw new IllegalArgumentException("Invalid task_recalc_status code: " + code);
+    throw new IllegalArgumentException("Invalid TaskRecalcStatus code: " + code);
   }
 }

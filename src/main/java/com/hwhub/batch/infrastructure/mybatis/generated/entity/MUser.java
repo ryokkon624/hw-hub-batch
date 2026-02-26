@@ -9,6 +9,8 @@ public class MUser {
 
   private String passwordHash;
 
+  private Date passwordChangedAt;
+
   private String authProvider;
 
   private String authProviderId;
@@ -18,6 +20,8 @@ public class MUser {
   private String profileImageKey;
 
   private String locale;
+
+  private Date emailVerifiedAt;
 
   private Boolean isActive;
 
@@ -55,6 +59,14 @@ public class MUser {
 
   public void setPasswordHash(String passwordHash) {
     this.passwordHash = passwordHash == null ? null : passwordHash.trim();
+  }
+
+  public Date getPasswordChangedAt() {
+    return passwordChangedAt;
+  }
+
+  public void setPasswordChangedAt(Date passwordChangedAt) {
+    this.passwordChangedAt = passwordChangedAt;
   }
 
   public String getAuthProvider() {
@@ -95,6 +107,14 @@ public class MUser {
 
   public void setLocale(String locale) {
     this.locale = locale == null ? null : locale.trim();
+  }
+
+  public Date getEmailVerifiedAt() {
+    return emailVerifiedAt;
+  }
+
+  public void setEmailVerifiedAt(Date emailVerifiedAt) {
+    this.emailVerifiedAt = emailVerifiedAt;
   }
 
   public Boolean getIsActive() {

@@ -5,11 +5,13 @@
     <id column="user_id" jdbcType="BIGINT" property="userId" />
     <result column="email" jdbcType="VARCHAR" property="email" />
     <result column="password_hash" jdbcType="VARCHAR" property="passwordHash" />
+    <result column="password_changed_at" jdbcType="TIMESTAMP" property="passwordChangedAt" />
     <result column="auth_provider" jdbcType="VARCHAR" property="authProvider" />
     <result column="auth_provider_id" jdbcType="VARCHAR" property="authProviderId" />
     <result column="display_name" jdbcType="VARCHAR" property="displayName" />
     <result column="profile_image_key" jdbcType="VARCHAR" property="profileImageKey" />
     <result column="locale" jdbcType="VARCHAR" property="locale" />
+    <result column="email_verified_at" jdbcType="TIMESTAMP" property="emailVerifiedAt" />
     <result column="is_active" jdbcType="BIT" property="isActive" />
     <result column="create_user_id" jdbcType="BIGINT" property="createUserId" />
     <result column="create_program" jdbcType="VARCHAR" property="createProgram" />
@@ -48,9 +50,9 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    user_id, email, password_hash, auth_provider, auth_provider_id, display_name, profile_image_key, 
-    `locale`, is_active, create_user_id, create_program, created_at, update_user_id, 
-    update_program, updated_at
+    user_id, email, password_hash, password_changed_at, auth_provider, auth_provider_id, 
+    display_name, profile_image_key, `locale`, email_verified_at, is_active, create_user_id, 
+    create_program, created_at, update_user_id, update_program, updated_at
   </sql>
   <select id="selectByExample" parameterType="com.hwhub.batch.infrastructure.mybatis.generated.entity.MUserExample" resultMap="BaseResultMap">
     select
@@ -78,16 +80,18 @@
     where user_id = #{userId,jdbcType=BIGINT}
   </delete>
   <insert id="insert" keyColumn="user_id" keyProperty="userId" parameterType="com.hwhub.batch.infrastructure.mybatis.generated.entity.MUser" useGeneratedKeys="true">
-    insert into m_user (email, password_hash, auth_provider, 
-      auth_provider_id, display_name, profile_image_key, 
-      `locale`, is_active, create_user_id, 
-      create_program, created_at, update_user_id, 
-      update_program, updated_at)
-    values (#{email,jdbcType=VARCHAR}, #{passwordHash,jdbcType=VARCHAR}, #{authProvider,jdbcType=VARCHAR}, 
-      #{authProviderId,jdbcType=VARCHAR}, #{displayName,jdbcType=VARCHAR}, #{profileImageKey,jdbcType=VARCHAR}, 
-      #{locale,jdbcType=VARCHAR}, #{isActive,jdbcType=BIT}, #{createUserId,jdbcType=BIGINT}, 
-      #{createProgram,jdbcType=VARCHAR}, #{createdAt,jdbcType=TIMESTAMP}, #{updateUserId,jdbcType=BIGINT}, 
-      #{updateProgram,jdbcType=VARCHAR}, #{updatedAt,jdbcType=TIMESTAMP})
+    insert into m_user (email, password_hash, password_changed_at, 
+      auth_provider, auth_provider_id, display_name, 
+      profile_image_key, `locale`, email_verified_at, 
+      is_active, create_user_id, create_program, 
+      created_at, update_user_id, update_program, 
+      updated_at)
+    values (#{email,jdbcType=VARCHAR}, #{passwordHash,jdbcType=VARCHAR}, #{passwordChangedAt,jdbcType=TIMESTAMP}, 
+      #{authProvider,jdbcType=VARCHAR}, #{authProviderId,jdbcType=VARCHAR}, #{displayName,jdbcType=VARCHAR}, 
+      #{profileImageKey,jdbcType=VARCHAR}, #{locale,jdbcType=VARCHAR}, #{emailVerifiedAt,jdbcType=TIMESTAMP}, 
+      #{isActive,jdbcType=BIT}, #{createUserId,jdbcType=BIGINT}, #{createProgram,jdbcType=VARCHAR}, 
+      #{createdAt,jdbcType=TIMESTAMP}, #{updateUserId,jdbcType=BIGINT}, #{updateProgram,jdbcType=VARCHAR}, 
+      #{updatedAt,jdbcType=TIMESTAMP})
   </insert>
   <insert id="insertSelective" keyColumn="user_id" keyProperty="userId" parameterType="com.hwhub.batch.infrastructure.mybatis.generated.entity.MUser" useGeneratedKeys="true">
     insert into m_user
@@ -97,6 +101,9 @@
       </if>
       <if test="passwordHash != null">
         password_hash,
+      </if>
+      <if test="passwordChangedAt != null">
+        password_changed_at,
       </if>
       <if test="authProvider != null">
         auth_provider,
@@ -112,6 +119,9 @@
       </if>
       <if test="locale != null">
         `locale`,
+      </if>
+      <if test="emailVerifiedAt != null">
+        email_verified_at,
       </if>
       <if test="isActive != null">
         is_active,
@@ -142,6 +152,9 @@
       <if test="passwordHash != null">
         #{passwordHash,jdbcType=VARCHAR},
       </if>
+      <if test="passwordChangedAt != null">
+        #{passwordChangedAt,jdbcType=TIMESTAMP},
+      </if>
       <if test="authProvider != null">
         #{authProvider,jdbcType=VARCHAR},
       </if>
@@ -156,6 +169,9 @@
       </if>
       <if test="locale != null">
         #{locale,jdbcType=VARCHAR},
+      </if>
+      <if test="emailVerifiedAt != null">
+        #{emailVerifiedAt,jdbcType=TIMESTAMP},
       </if>
       <if test="isActive != null">
         #{isActive,jdbcType=BIT},
@@ -189,6 +205,9 @@
       <if test="passwordHash != null">
         password_hash = #{passwordHash,jdbcType=VARCHAR},
       </if>
+      <if test="passwordChangedAt != null">
+        password_changed_at = #{passwordChangedAt,jdbcType=TIMESTAMP},
+      </if>
       <if test="authProvider != null">
         auth_provider = #{authProvider,jdbcType=VARCHAR},
       </if>
@@ -203,6 +222,9 @@
       </if>
       <if test="locale != null">
         `locale` = #{locale,jdbcType=VARCHAR},
+      </if>
+      <if test="emailVerifiedAt != null">
+        email_verified_at = #{emailVerifiedAt,jdbcType=TIMESTAMP},
       </if>
       <if test="isActive != null">
         is_active = #{isActive,jdbcType=BIT},
@@ -232,11 +254,13 @@
     update m_user
     set email = #{email,jdbcType=VARCHAR},
       password_hash = #{passwordHash,jdbcType=VARCHAR},
+      password_changed_at = #{passwordChangedAt,jdbcType=TIMESTAMP},
       auth_provider = #{authProvider,jdbcType=VARCHAR},
       auth_provider_id = #{authProviderId,jdbcType=VARCHAR},
       display_name = #{displayName,jdbcType=VARCHAR},
       profile_image_key = #{profileImageKey,jdbcType=VARCHAR},
       `locale` = #{locale,jdbcType=VARCHAR},
+      email_verified_at = #{emailVerifiedAt,jdbcType=TIMESTAMP},
       is_active = #{isActive,jdbcType=BIT},
       create_user_id = #{createUserId,jdbcType=BIGINT},
       create_program = #{createProgram,jdbcType=VARCHAR},
