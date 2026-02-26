@@ -98,7 +98,10 @@ jacocoTestReport {
                     fileTree(dir: dir, exclude: [
                             'com/hwhub/batch/infrastructure/mybatis/generated/entity/**',
                             'com/hwhub/batch/infrastructure/mybatis/repository/**',
+                            'com/hwhub/batch/infrastructure/mybatis/custom/entity/**',
                             'com/hwhub/batch/domain/enums/**',
+                            'com/hwhub/batch/tool/**',
+                            'com/hwhub/batch/config/**',
                     ])
                 })
         )
