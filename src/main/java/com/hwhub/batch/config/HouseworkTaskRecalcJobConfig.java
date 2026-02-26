@@ -1,6 +1,7 @@
 package com.hwhub.batch.config;
 
 import com.hwhub.batch.application.service.HouseworkTaskRecalcService;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
@@ -11,6 +12,7 @@ import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.lang.NonNull;
 import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
@@ -24,13 +26,15 @@ public class HouseworkTaskRecalcJobConfig {
   // 1回のジョブで処理するキューの最大件数（必要に応じて調整）
   private static final int FETCH_LIMIT = 100;
 
-  private final JobRepository jobRepository;
-  private final PlatformTransactionManager transactionManager;
-  private final HouseworkTaskRecalcService service;
+  @NonNull private final JobRepository jobRepository;
+  @NonNull private final PlatformTransactionManager transactionManager;
+  @NonNull private final HouseworkTaskRecalcService service;
 
   @Bean
   public Job houseworkTaskRecalcJob() {
-    return new JobBuilder(JOB_NAME, jobRepository).start(houseworkTaskRecalcStep()).build();
+    return new JobBuilder(JOB_NAME, jobRepository)
+        .start(Objects.requireNonNull(houseworkTaskRecalcStep()))
+        .build();
   }
 
   @Bean

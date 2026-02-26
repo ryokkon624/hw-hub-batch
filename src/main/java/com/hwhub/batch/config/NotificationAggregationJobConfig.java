@@ -1,6 +1,7 @@
 package com.hwhub.batch.config;
 
 import com.hwhub.batch.application.service.NotificationAggregationService;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
@@ -11,6 +12,7 @@ import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.lang.NonNull;
 import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
@@ -21,13 +23,15 @@ public class NotificationAggregationJobConfig {
   public static final String JOB_NAME = "notificationAggregationJob";
   public static final String STEP_NAME = "notificationAggregationStep";
 
-  private final JobRepository jobRepository;
-  private final PlatformTransactionManager transactionManager;
-  private final NotificationAggregationService service;
+  @NonNull private final JobRepository jobRepository;
+  @NonNull private final PlatformTransactionManager transactionManager;
+  @NonNull private final NotificationAggregationService service;
 
   @Bean
   public Job notificationAggregationJob() {
-    return new JobBuilder(JOB_NAME, jobRepository).start(notificationAggregationStep()).build();
+    return new JobBuilder(JOB_NAME, jobRepository)
+        .start(Objects.requireNonNull(notificationAggregationStep()))
+        .build();
   }
 
   @Bean
