@@ -106,12 +106,13 @@ jobs:
         run: |
           TD_ARN="${{ steps.taskdef.outputs.taskdef_arn }}"
 
-          # schedule一覧（4つ）を更新
+          # schedule一覧を更新
           for NAME in \
             "hwhub-batch-stg-invitation-expire-daily-0100-jst" \
             "hwhub-batch-stg-housework-generate-daily-0300-jst" \
             "hwhub-batch-stg-housework-recalc-hourly" \
-            "hwhub-batch-stg-household-cleanup-monthly-15-0000-jst"
+            "hwhub-batch-stg-household-cleanup-monthly-15-0000-jst" \
+            "hwhub-batch-stg-notification-aggregate-every-4h-jst"
           do
             echo "Updating ${NAME}..."
             # 既存 schedule を取得して、Target.EcsParameters.TaskDefinitionArn だけ差し替えて Update
