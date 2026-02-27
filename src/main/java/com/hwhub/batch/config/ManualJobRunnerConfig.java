@@ -1,6 +1,7 @@
 package com.hwhub.batch.config;
 
 import java.util.List;
+import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.Job;
@@ -49,7 +50,7 @@ public class ManualJobRunnerConfig {
         log.info(">>> Launching job '{}' with params={}", jobName, params);
 
         // --- 起動 ---
-        jobLauncher.run(job, params);
+        jobLauncher.run(Objects.requireNonNull(job), params);
 
         log.info(">>> Job '{}' finished.", jobName);
       }

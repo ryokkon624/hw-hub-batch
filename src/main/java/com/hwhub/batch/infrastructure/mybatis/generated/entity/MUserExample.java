@@ -305,6 +305,66 @@ public class MUserExample {
       return (Criteria) this;
     }
 
+    public Criteria andPasswordChangedAtIsNull() {
+      addCriterion("password_changed_at is null");
+      return (Criteria) this;
+    }
+
+    public Criteria andPasswordChangedAtIsNotNull() {
+      addCriterion("password_changed_at is not null");
+      return (Criteria) this;
+    }
+
+    public Criteria andPasswordChangedAtEqualTo(Date value) {
+      addCriterion("password_changed_at =", value, "passwordChangedAt");
+      return (Criteria) this;
+    }
+
+    public Criteria andPasswordChangedAtNotEqualTo(Date value) {
+      addCriterion("password_changed_at <>", value, "passwordChangedAt");
+      return (Criteria) this;
+    }
+
+    public Criteria andPasswordChangedAtGreaterThan(Date value) {
+      addCriterion("password_changed_at >", value, "passwordChangedAt");
+      return (Criteria) this;
+    }
+
+    public Criteria andPasswordChangedAtGreaterThanOrEqualTo(Date value) {
+      addCriterion("password_changed_at >=", value, "passwordChangedAt");
+      return (Criteria) this;
+    }
+
+    public Criteria andPasswordChangedAtLessThan(Date value) {
+      addCriterion("password_changed_at <", value, "passwordChangedAt");
+      return (Criteria) this;
+    }
+
+    public Criteria andPasswordChangedAtLessThanOrEqualTo(Date value) {
+      addCriterion("password_changed_at <=", value, "passwordChangedAt");
+      return (Criteria) this;
+    }
+
+    public Criteria andPasswordChangedAtIn(List<Date> values) {
+      addCriterion("password_changed_at in", values, "passwordChangedAt");
+      return (Criteria) this;
+    }
+
+    public Criteria andPasswordChangedAtNotIn(List<Date> values) {
+      addCriterion("password_changed_at not in", values, "passwordChangedAt");
+      return (Criteria) this;
+    }
+
+    public Criteria andPasswordChangedAtBetween(Date value1, Date value2) {
+      addCriterion("password_changed_at between", value1, value2, "passwordChangedAt");
+      return (Criteria) this;
+    }
+
+    public Criteria andPasswordChangedAtNotBetween(Date value1, Date value2) {
+      addCriterion("password_changed_at not between", value1, value2, "passwordChangedAt");
+      return (Criteria) this;
+    }
+
     public Criteria andAuthProviderIsNull() {
       addCriterion("auth_provider is null");
       return (Criteria) this;
@@ -652,6 +712,66 @@ public class MUserExample {
 
     public Criteria andLocaleNotBetween(String value1, String value2) {
       addCriterion("`locale` not between", value1, value2, "locale");
+      return (Criteria) this;
+    }
+
+    public Criteria andEmailVerifiedAtIsNull() {
+      addCriterion("email_verified_at is null");
+      return (Criteria) this;
+    }
+
+    public Criteria andEmailVerifiedAtIsNotNull() {
+      addCriterion("email_verified_at is not null");
+      return (Criteria) this;
+    }
+
+    public Criteria andEmailVerifiedAtEqualTo(Date value) {
+      addCriterion("email_verified_at =", value, "emailVerifiedAt");
+      return (Criteria) this;
+    }
+
+    public Criteria andEmailVerifiedAtNotEqualTo(Date value) {
+      addCriterion("email_verified_at <>", value, "emailVerifiedAt");
+      return (Criteria) this;
+    }
+
+    public Criteria andEmailVerifiedAtGreaterThan(Date value) {
+      addCriterion("email_verified_at >", value, "emailVerifiedAt");
+      return (Criteria) this;
+    }
+
+    public Criteria andEmailVerifiedAtGreaterThanOrEqualTo(Date value) {
+      addCriterion("email_verified_at >=", value, "emailVerifiedAt");
+      return (Criteria) this;
+    }
+
+    public Criteria andEmailVerifiedAtLessThan(Date value) {
+      addCriterion("email_verified_at <", value, "emailVerifiedAt");
+      return (Criteria) this;
+    }
+
+    public Criteria andEmailVerifiedAtLessThanOrEqualTo(Date value) {
+      addCriterion("email_verified_at <=", value, "emailVerifiedAt");
+      return (Criteria) this;
+    }
+
+    public Criteria andEmailVerifiedAtIn(List<Date> values) {
+      addCriterion("email_verified_at in", values, "emailVerifiedAt");
+      return (Criteria) this;
+    }
+
+    public Criteria andEmailVerifiedAtNotIn(List<Date> values) {
+      addCriterion("email_verified_at not in", values, "emailVerifiedAt");
+      return (Criteria) this;
+    }
+
+    public Criteria andEmailVerifiedAtBetween(Date value1, Date value2) {
+      addCriterion("email_verified_at between", value1, value2, "emailVerifiedAt");
+      return (Criteria) this;
+    }
+
+    public Criteria andEmailVerifiedAtNotBetween(Date value1, Date value2) {
+      addCriterion("email_verified_at not between", value1, value2, "emailVerifiedAt");
       return (Criteria) this;
     }
 

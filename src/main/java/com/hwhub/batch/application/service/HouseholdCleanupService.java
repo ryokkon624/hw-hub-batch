@@ -23,7 +23,7 @@ public class HouseholdCleanupService {
     // 1ヶ月以上更新がなく、メンバーが0人の世帯を物理削除する
     // 付随するデータもカスケード削除される（Repository実装内で処理）
     int deletedCount =
-        repository.deleteOrphanedHouseholds(SYSTEM_USER_ID, ProgramType.BTC_HLD_CLN.getCode());
+        repository.deleteOrphanedHouseholds(SYSTEM_USER_ID, ProgramType.BTC_HLD_CLEN.getCode());
 
     log.info("Finished household cleanup. Deleted count: {}", deletedCount);
     return deletedCount;

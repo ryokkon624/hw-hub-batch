@@ -78,9 +78,10 @@ src/main/java/com/hwhub/batch
 ./gradlew bootRun --args='--spring.batch.job.name=houseworkTaskGenerateJob'
 ./gradlew bootRun --args='--spring.batch.job.name=houseworkTaskRecalcJob'
 ./gradlew bootRun --args='--spring.batch.job.name=householdCleanupJob'
+./gradlew bootRun --args='--spring.batch.job.name=notificationAggregationJob'
 ```
 
----
+---`
 
 ## ジョブ一覧（例）
 
@@ -88,6 +89,7 @@ src/main/java/com/hwhub/batch
 - houseworkTaskGenerateJob：家事タスクの定期生成
 - houseworkTaskRecalcJob：家事タスクの再計算
 - householdCleanupJob：世帯の削除
+- notificationAggregationJob：通知イベントの集約
 
 ---
 

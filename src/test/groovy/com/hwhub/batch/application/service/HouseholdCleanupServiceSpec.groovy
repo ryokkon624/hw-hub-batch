@@ -21,7 +21,7 @@ class HouseholdCleanupServiceSpec extends Specification {
         int actual = service.cleanupHouseholds()
 
         then:
-        1 * repository.deleteOrphanedHouseholds(_, ProgramType.BTC_HLD_CLN.code) >> expectedDeleted
+        1 * repository.deleteOrphanedHouseholds(_, ProgramType.BTC_HLD_CLEN.code) >> expectedDeleted
         actual == expectedDeleted
     }
 }

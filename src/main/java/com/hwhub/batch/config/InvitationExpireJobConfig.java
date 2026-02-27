@@ -1,6 +1,7 @@
 package com.hwhub.batch.config;
 
 import com.hwhub.batch.application.service.InvitationExpireService;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
@@ -11,6 +12,7 @@ import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.lang.NonNull;
 import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
@@ -21,13 +23,15 @@ public class InvitationExpireJobConfig {
   public static final String JOB_NAME = "invitationExpireJob";
   public static final String STEP_NAME = "invitationExpireStep";
 
-  private final JobRepository jobRepository;
-  private final PlatformTransactionManager transactionManager;
-  private final InvitationExpireService service;
+  @NonNull private final JobRepository jobRepository;
+  @NonNull private final PlatformTransactionManager transactionManager;
+  @NonNull private final InvitationExpireService service;
 
   @Bean
   public Job invitationExpireJob() {
-    return new JobBuilder(JOB_NAME, jobRepository).start(invitationExpireStep()).build();
+    return new JobBuilder(JOB_NAME, jobRepository)
+        .start(Objects.requireNonNull(invitationExpireStep()))
+        .build();
   }
 
   @Bean
