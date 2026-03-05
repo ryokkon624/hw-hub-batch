@@ -3,6 +3,7 @@ name: deploy-batch-stg
 on:
   push:
     branches: [ "main" ]
+  workflow_dispatch:
 
 permissions:
   id-token: write
@@ -51,11 +52,11 @@ jobs:
           JAR=$(ls build/libs/*-SNAPSHOT.jar | grep -v -- '-plain\.jar$' | head -n 1)
           cp "$JAR" build/libs/app.jar
 
-      - name: Build & Push Docker image
+      - name: Build & Push Docker image (stg-${GITHUB_SHA} and stg-latest)
         run: |
-          IMAGE_TAG_SHA=stg-${GITHUB_SHA}
-          IMAGE_URI_SHA=${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:${IMAGE_TAG_SHA}
-          IMAGE_URI_LATEST=${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:stg-latest
+          IMAGE_TAG_SHA="stg-${GITHUB_SHA}"
+          IMAGE_URI_SHA="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:${IMAGE_TAG_SHA}"
+          IMAGE_URI_LATEST="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:stg-latest"
 
           docker build -t "${IMAGE_URI_SHA}" -t "${IMAGE_URI_LATEST}" .
           docker push "${IMAGE_URI_SHA}"
@@ -63,66 +64,3 @@ jobs:
 
           echo "Pushed: ${IMAGE_URI_SHA}"
           echo "Pushed: ${IMAGE_URI_LATEST}"
-
-      - name: Register new task definition revision (replace image)
-        id: taskdef
-        run: |
-          IMAGE_URI_LATEST=${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:stg-latest
-
-          # 既存 taskdef を取得
-          aws ecs describe-task-definition \
-            --task-definition hwhub-batch-stg \
-            --query taskDefinition > taskdef.json
-
-          # imageだけ置換して登録（jq 必要）
-          sudo apt-get update && sudo apt-get install -y jq
-
-          NEW_TASKDEF=$(jq \
-            --arg IMAGE "${IMAGE_URI_LATEST}" \
-            'del(
-              .taskDefinitionArn,
-              .revision,
-              .status,
-              .requiresAttributes,
-              .compatibilities,
-              .registeredAt,
-              .registeredBy
-            )
-            | .containerDefinitions[0].image=$IMAGE
-            ' taskdef.json)
-
-          echo "${NEW_TASKDEF}" > taskdef.new.json
-
-          # 新 revision 登録
-          ARN=$(aws ecs register-task-definition \
-            --cli-input-json file://taskdef.new.json \
-            --query 'taskDefinition.taskDefinitionArn' \
-            --output text)
-
-          echo "taskdef_arn=${ARN}" >> $GITHUB_OUTPUT
-          echo "Registered: ${ARN}"
-
-      - name: Update schedules to use new task definition revision
-        run: |
-          TD_ARN="${{ steps.taskdef.outputs.taskdef_arn }}"
-
-          # schedule一覧を更新
-          for NAME in \
-            "hwhub-batch-stg-invitation-expire-daily-0100-jst" \
-            "hwhub-batch-stg-housework-generate-daily-0300-jst" \
-            "hwhub-batch-stg-housework-recalc-hourly" \
-            "hwhub-batch-stg-household-cleanup-monthly-15-0000-jst" \
-            "hwhub-batch-stg-notification-aggregate-every-4h-jst"
-          do
-            echo "Updating ${NAME}..."
-            # 既存 schedule を取得して、Target.EcsParameters.TaskDefinitionArn だけ差し替えて Update
-            aws scheduler get-schedule --name "${NAME}" > sched.json
-
-            # update-schedule に不要なレスポンス要素を落として、TaskDefinitionArn だけ差し替える
-            jq --arg TD "${TD_ARN}" '
-            del(.Arn, .CreationDate, .LastModificationDate, .State, .ResponseMetadata) |
-            .Target.EcsParameters.TaskDefinitionArn = $TD
-            ' sched.json > sched.new.json
-          
-            aws scheduler update-schedule --name "${NAME}" --cli-input-json file://sched.new.json
-          done
