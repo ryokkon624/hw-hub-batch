@@ -139,14 +139,14 @@ build/reports/jacoco/test/html/index.html
 ---
 
 ## デプロイフロー（stg）
+デプロイ先の環境はEphemeral STGとしているためPull Request前にterraform applyし環境を立ち上げておくこと
 
 1. main ブランチに push
 2. GitHub Actions が：
    - build
    - test
    - docker build & push
-   - ECS タスク定義更新
-   - EventBridge Scheduler の TaskDefinition 更新
+   - ECS タスク定義更新 ※Schedulerは最新を参照
 
 ---
 
