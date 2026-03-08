@@ -131,6 +131,7 @@ public class NotificationModel {
       Long actorUserId,
       Long targetUserId,
       LocalDateTime occurredAt,
+      String aggregatedKey,
       int aggregatedCount) {
     return new NotificationModel(
         null,
@@ -143,7 +144,7 @@ public class NotificationModel {
         null,
         null,
         occurredAt,
-        null,
+        aggregatedKey,
         aggregatedCount);
   }
 

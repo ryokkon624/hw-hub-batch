@@ -15,7 +15,6 @@ import com.hwhub.batch.domain.repository.HouseholdRepository;
 import com.hwhub.batch.domain.repository.NotificationEventRepository;
 import com.hwhub.batch.domain.repository.NotificationRepository;
 import com.hwhub.batch.domain.repository.UserRepository;
-import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -33,7 +32,6 @@ public class NotificationAggregationService {
   private static final long SYSTEM_USER_ID = 2;
   // 1回のバッチで処理する最大件数
   private static final int CLAIM_LIMIT = 2000;
-  private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy/MM/dd");
 
   private final NotificationRepository repository;
   private final NotificationEventRepository eventRepository;
@@ -115,7 +113,7 @@ public class NotificationAggregationService {
     // params
     Map<String, Object> params = new LinkedHashMap<>();
     params.put("household", householdNameMap.get(model.getHouseholdId()));
-    params.put("date", model.getOccurredAt().toLocalDate().format(DATE_FORMATTER));
+    params.put("date", model.getAggregatedKey());
     params.put("count", model.getAggregatedCount());
     params.put(
         "actorName",
@@ -216,10 +214,10 @@ public class NotificationAggregationService {
    */
   private String resolveTitleKey(NotificationType type) {
     return switch (type) {
-      case TASK_ASSIGNED -> "notifications.taskAssigned.title";
-      case BE_DUMPED_TASK -> "notifications.beDumpedTasks.title";
-      case YOUR_TASK_WAS_TAKEN -> "notifications.yourTaskWasTaken.title";
-      default -> "notifications.generic.title";
+      case TASK_ASSIGNED -> "notifications.messages.taskAssigned.title";
+      case BE_DUMPED_TASK -> "notifications.messages.beDumpedTasks.title";
+      case YOUR_TASK_WAS_TAKEN -> "notifications.messages.yourTaskWasTaken.title";
+      default -> "notifications.messages.generic.title";
     };
   }
 
@@ -231,10 +229,10 @@ public class NotificationAggregationService {
    */
   private String resolveBodyKey(NotificationType type) {
     return switch (type) {
-      case TASK_ASSIGNED -> "notifications.taskAssigned.body";
-      case BE_DUMPED_TASK -> "notifications.beDumpedTasks.body";
-      case YOUR_TASK_WAS_TAKEN -> "notifications.yourTaskWasTaken.body";
-      default -> "notifications.generic.body";
+      case TASK_ASSIGNED -> "notifications.messages.taskAssigned.body";
+      case BE_DUMPED_TASK -> "notifications.messages.beDumpedTasks.body";
+      case YOUR_TASK_WAS_TAKEN -> "notifications.messages.yourTaskWasTaken.body";
+      default -> "notifications.messages.generic.body";
     };
   }
 }
