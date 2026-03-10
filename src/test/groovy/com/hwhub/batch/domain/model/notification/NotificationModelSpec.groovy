@@ -61,9 +61,12 @@ class NotificationModelSpec extends Specification {
         LocalDateTime occurredAt = LocalDateTime.of(2023, 1, 1, 10, 0)
         int aggregatedCount = 2
 
+        and: "集約キー"
+        String aggregatedKey = "2023/01/01"
+
         when: "reconstructFromEventを呼び出す"
         NotificationModel model = NotificationModel.reconstructFromEvent(
-                householdId, notificationType, actorUserId, targetUserId, occurredAt, aggregatedCount
+                householdId, notificationType, actorUserId, targetUserId, occurredAt, aggregatedKey, aggregatedCount
         )
 
         then: "期待通りのフィールドが設定されること"
@@ -78,7 +81,7 @@ class NotificationModelSpec extends Specification {
         model.getReadAt() == null
         model.getMessage() == null
         model.getLink() == null
-        model.getAggregatedKey() == null
+        model.getAggregatedKey() == aggregatedKey
     }
 
     def "newUnreadメソッドで未読のNotificationModelを新規作成できること"() {
@@ -147,7 +150,7 @@ class NotificationModelSpec extends Specification {
     def "setMessageAndLinkメソッドでメッセージとリンクが更新されること"() {
         given: "メッセージとリンクなしのモデルを準備"
         NotificationModel model = NotificationModel.reconstructFromEvent(
-                10L, "0301", 100L, 200L, LocalDateTime.now(), 2
+                10L, "0301", 100L, 200L, LocalDateTime.now(), "2023/01/01", 2
         )
         NotificationMessage newMessage = new NotificationMessage("new.title", "new.body", [:])
         NotificationLink newLink = new NotificationLink(NotificationLinkType.HOUSEHOLD, 1L)

@@ -50,11 +50,11 @@ class NotificationAggregationServiceSpec extends Specification {
 
         and: "イベントが集約されて3件返る"
         LocalDateTime now = LocalDateTime.now()
-        NotificationModel model1 = NotificationModel.reconstructFromEvent(1L, "0301", 100L, 200L, now, 2)
-        NotificationModel model2 = NotificationModel.reconstructFromEvent(2L, "0302", 101L, 201L, now, 1)
-        NotificationModel model3 = NotificationModel.reconstructFromEvent(3L, "0303", 102L, 202L, now, 5)
+        NotificationModel model1 = NotificationModel.reconstructFromEvent(1L, "0301", 100L, 200L, now, "2023/01/01", 2)
+        NotificationModel model2 = NotificationModel.reconstructFromEvent(2L, "0302", 101L, 201L, now, "2023/01/02", 1)
+        NotificationModel model3 = NotificationModel.reconstructFromEvent(3L, "0303", 102L, 202L, now, "2023/01/03", 5)
         // NotificationType.fromCode()がIllegalArgumentExceptionを投げるため、既存のコードを入れてdefault分岐を通す
-        NotificationModel model4_real = NotificationModel.reconstructFromEvent(4L, "0101", 103L, 203L, now, 1)
+        NotificationModel model4_real = NotificationModel.reconstructFromEvent(4L, "0101", 103L, 203L, now, "2023/01/04", 1)
         
         List<NotificationModel> rows = [model1, model2, model3, model4_real]
 
@@ -93,26 +93,26 @@ class NotificationAggregationServiceSpec extends Specification {
 
         and: "モデルに正しいパラメータが設定されていること"
         // model1 (Nickname)
-        model1.getMessage().titleKey() == "notifications.taskAssigned.title"
-        model1.getMessage().bodyKey() == "notifications.taskAssigned.body"
+        model1.getMessage().titleKey() == "notifications.messages.taskAssigned.title"
+        model1.getMessage().bodyKey() == "notifications.messages.taskAssigned.body"
         model1.getMessage().params().get("actorName") == "Nick 1"
         model1.getMessage().params().get("household") == "Household 1"
 
         // model2 (DisplayName fallback)
-        model2.getMessage().titleKey() == "notifications.beDumpedTasks.title"
-        model2.getMessage().bodyKey() == "notifications.beDumpedTasks.body"
+        model2.getMessage().titleKey() == "notifications.messages.beDumpedTasks.title"
+        model2.getMessage().bodyKey() == "notifications.messages.beDumpedTasks.body"
         model2.getMessage().params().get("actorName") == "Display 101"
         model2.getMessage().params().get("household") == "Household 2"
 
         // model3 (User ID fallback)
-        model3.getMessage().titleKey() == "notifications.yourTaskWasTaken.title"
-        model3.getMessage().bodyKey() == "notifications.yourTaskWasTaken.body"
+        model3.getMessage().titleKey() == "notifications.messages.yourTaskWasTaken.title"
+        model3.getMessage().bodyKey() == "notifications.messages.yourTaskWasTaken.body"
         model3.getMessage().params().get("actorName") == "102"
         model3.getMessage().params().get("household") == null
 
         // model4_real (User completely not found, ID fallback & default title)
-        model4_real.getMessage().titleKey() == "notifications.generic.title"
-        model4_real.getMessage().bodyKey() == "notifications.generic.body"
+        model4_real.getMessage().titleKey() == "notifications.messages.generic.title"
+        model4_real.getMessage().bodyKey() == "notifications.messages.generic.body"
         model4_real.getMessage().params().get("actorName") == "103"
         model4_real.getMessage().params().get("household") == null
     }

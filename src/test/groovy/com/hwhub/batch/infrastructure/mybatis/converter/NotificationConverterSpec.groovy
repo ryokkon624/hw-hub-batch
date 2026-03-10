@@ -66,7 +66,7 @@ class NotificationConverterSpec extends Specification {
     def "toEntityメソッドでparamsがnullまたは空の場合に適切に処理されること"() {
         given: "パラメータが空のモデル"
         NotificationModel model = NotificationModel.reconstructFromEvent(
-                10L, "0301", 100L, 200L, LocalDateTime.now(), 1
+                10L, "0301", 100L, 200L, LocalDateTime.now(), "2023/01/01", 1
         )
         // 初期状態ではmessage、link等はnullなので設定
         model.setMessageAndLink(
@@ -85,7 +85,7 @@ class NotificationConverterSpec extends Specification {
     def "toEntityメソッドでJSONマッピングに失敗した場合、IllegalStateExceptionがスローされること"() {
         given: "JSON変換に失敗する状況"
         NotificationModel model = NotificationModel.reconstructFromEvent(
-                10L, "0301", 100L, 200L, LocalDateTime.now(), 1
+                10L, "0301", 100L, 200L, LocalDateTime.now(), "2023/01/01", 1
         )
         model.setMessageAndLink(
                 new com.hwhub.batch.domain.model.notification.NotificationMessage("title", "body", ["k":"v"]),
@@ -200,8 +200,13 @@ class NotificationConverterSpec extends Specification {
     def "toModel(NotificationEventAggregationRow)メソッドでNotificationModelへマッピングされること"() {
         given: "Rowを準備"
         LocalDateTime occurredAt = LocalDateTime.of(2023, 1, 1, 10, 0)
+        LocalDateTime aggregationDate = LocalDateTime.of(2023, 6, 15, 0, 0)
         NotificationEventAggregationRow row = new NotificationEventAggregationRow(
-                10L, "0301", 100L, 200L, java.util.Date.from(occurredAt.atZone(ZoneId.systemDefault()).toInstant()), 2, null, null
+                10L, "0301", 100L, 200L,
+                java.util.Date.from(occurredAt.atZone(ZoneId.systemDefault()).toInstant()),
+                2,
+                java.util.Date.from(aggregationDate.atZone(ZoneId.systemDefault()).toInstant()),
+                null
         )
 
         when: "toModelを呼び出す"
@@ -213,6 +218,7 @@ class NotificationConverterSpec extends Specification {
         model.getActorUserId() == 100L
         model.getTargetUserId() == 200L
         model.getOccurredAt() == occurredAt
+        model.getAggregatedKey() == "2023/06/15"
         model.getAggregatedCount() == 2
         !model.isRead()
     }
