@@ -1,8 +1,8 @@
 package com.hwhub.batch.infrastructure.mybatis.converter
 
-import com.fasterxml.jackson.core.JsonProcessingException
-import com.fasterxml.jackson.core.type.TypeReference
-import com.fasterxml.jackson.databind.ObjectMapper
+import tools.jackson.core.JacksonException
+import tools.jackson.core.type.TypeReference
+import tools.jackson.databind.ObjectMapper
 import com.hwhub.batch.domain.enums.NotificationLinkType
 import com.hwhub.batch.domain.enums.NotificationType
 import com.hwhub.batch.domain.model.notification.NotificationModel
@@ -92,7 +92,7 @@ class NotificationConverterSpec extends Specification {
                 new com.hwhub.batch.domain.model.notification.NotificationLink(NotificationLinkType.MY_TASKS, null)
         )
         
-        objectMapper.writeValueAsString(_) >> { throw new JsonProcessingException("error") {} }
+        objectMapper.writeValueAsString(_) >> { throw new JacksonException("error") {} }
 
         when: "toEntityを呼び出す"
         converter.toEntity(model)
@@ -181,7 +181,7 @@ class NotificationConverterSpec extends Specification {
         entity2.setIsRead(false)
         entity2.setParamsJson('invalid-json')
         
-        objectMapper.readValue('invalid-json', _ as TypeReference) >> { throw new JsonProcessingException("err") {} }
+        objectMapper.readValue('invalid-json', _ as TypeReference) >> { throw new JacksonException("err") {} }
 
         when: "toModelを呼び出す"
         NotificationModel model1 = converter.toModel(entity1)
