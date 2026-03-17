@@ -7,8 +7,7 @@ spring:
   batch:
     job:
       enabled: false
-    jdbc:
-      initialize-schema: NEVER  # Flywayで作る想定
+    initialize-schema: NEVER  # Flywayで作る想定
 
 mybatis:
   mapper-locations: classpath*:mapper/**/*.xml

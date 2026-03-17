@@ -1,13 +1,10 @@
 package com.hwhub.batch.config;
 
 import java.util.List;
-import java.util.Objects;
+import java.util.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.batch.core.job.Job;
-import org.springframework.batch.core.job.parameters.JobParameters;
-import org.springframework.batch.core.job.parameters.JobParametersBuilder;
-import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
@@ -19,7 +16,7 @@ public class ManualJobRunnerConfig {
   private static final Logger log = LoggerFactory.getLogger(ManualJobRunnerConfig.class);
 
   @Bean
-  public ApplicationRunner manualJobRunner(JobLauncher jobLauncher, List<Job> jobs) {
+  public ApplicationRunner manualJobRunner(JobOperator jobOperator) {
     return new ApplicationRunner() {
       @Override
       public void run(ApplicationArguments args) throws Exception {
@@ -34,23 +31,12 @@ public class ManualJobRunnerConfig {
 
         String jobName = optionValues.getFirst();
 
-        // --- 登録されている Job の中から該当 Job を探す ---
-        Job job =
-            jobs.stream()
-                .filter(j -> j.getName().equals(jobName))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Job not found: " + jobName));
-
-        // --- JobParameters ---
-        JobParameters params =
-            new JobParametersBuilder()
-                .addLong("run.id", System.currentTimeMillis())
-                .toJobParameters();
-
-        log.info(">>> Launching job '{}' with params={}", jobName, params);
+        log.info(">>> Launching job '{}'", jobName);
 
         // --- 起動 ---
-        jobLauncher.run(Objects.requireNonNull(job), params);
+        Properties params = new Properties();
+        params.setProperty("run.id", String.valueOf(System.currentTimeMillis()));
+        jobOperator.start(jobName, params);
 
         log.info(">>> Job '{}' finished.", jobName);
       }
