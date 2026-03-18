@@ -96,8 +96,26 @@ src/main/java/com/hwhub/batch
 ## テストの実行方法
 
 ```bash
+# UT（単体テスト）
 ./gradlew test
 ```
+
+統合テスト（PR時にCIで実行、ローカルでも実行可能）：
+
+```bash
+./gradlew integrationTest
+```
+
+全テスト実行（UT＋統合テスト）：
+
+```bash
+./gradlew clean test integrationTest
+```
+
+**統合テストについて：**
+- Testcontainers を使用してMySQLコンテナを自動起動
+- Flywayマイグレーションが自動適用される
+- PRのCIパイプラインで自動実行される
 
 カバレッジレポート：
 

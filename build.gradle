@@ -1,7 +1,7 @@
 plugins {
     id 'java'
     id 'groovy'
-    id 'org.springframework.boot' version '3.5.11'
+    id 'org.springframework.boot' version '4.0.3'
     id 'io.spring.dependency-management' version '1.1.7'
     id 'jacoco'
     id 'com.diffplug.spotless' version '6.25.0'
@@ -41,7 +41,7 @@ dependencies {
     runtimeOnly 'com.mysql:mysql-connector-j:9.5.0'
 
     // MyBatis
-    implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.5'
+    implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:4.0.0'
     mybatisGenerator 'com.mysql:mysql-connector-j:9.5.0'
     mybatisGenerator 'org.mybatis.generator:mybatis-generator-core:1.4.2'
 
@@ -49,20 +49,47 @@ dependencies {
 
     // テスト系
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
     testImplementation 'org.springframework.batch:spring-batch-test'
-    testImplementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter-test:3.0.5'
+    testImplementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter-test:4.0.0'
 
-    // Spock（Groovy 4 用）
-    testImplementation platform('org.spockframework:spock-bom:2.3-groovy-4.0')
+    // Spock（Groovy 5 用）
+    testImplementation platform('org.spockframework:spock-bom:2.4-groovy-5.0')
     testImplementation 'org.spockframework:spock-core'
     testImplementation 'org.spockframework:spock-spring'
+
+    // Testcontainers（統合テスト用）
+    testImplementation 'org.springframework.boot:spring-boot-testcontainers'
+    testImplementation 'org.testcontainers:mysql:1.21.4'
+    testImplementation 'org.testcontainers:testcontainers:1.21.4'
+    testImplementation 'org.testcontainers:junit-jupiter:1.21.4'
+    testImplementation 'org.springframework.boot:spring-boot-starter-flyway'
+    testImplementation 'org.flywaydb:flyway-mysql'
 
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
+// UT用タスク
 tasks.named('test') {
-    useJUnitPlatform()
+    useJUnitPlatform {
+        excludeTags 'integration'
+    }
     finalizedBy jacocoTestReport
+}
+
+// 統合テスト専用タスク
+tasks.register('integrationTest', Test) {
+    description = 'Runs integration tests'
+    group = 'verification'
+    testClassesDirs = sourceSets.test.output.classesDirs
+    classpath = sourceSets.test.runtimeClasspath
+    useJUnitPlatform {
+        includeTags 'integration'
+    }
+    jvmArgs += [
+        '-Dspring.test.context.cache.maxSize=1'
+    ]
+    environment 'SPRING_PROFILES_ACTIVE', 'test'
 }
 
 tasks.register('mybatisGenerator', JavaExec) {

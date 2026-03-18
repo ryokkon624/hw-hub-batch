@@ -1,13 +1,13 @@
 package com.hwhub.batch.infrastructure.mybatis.converter;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hwhub.batch.domain.model.notification.NotificationModel;
 import com.hwhub.batch.infrastructure.mybatis.custom.entity.NotificationEventAggregationRow;
 import com.hwhub.batch.infrastructure.mybatis.generated.entity.TNotification;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
 import org.springframework.stereotype.Component;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.ObjectMapper;
 
 @Component
 public class NotificationConverter {

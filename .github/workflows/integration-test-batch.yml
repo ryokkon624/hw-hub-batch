@@ -1,0 +1,42 @@
+name: integration-test-batch
+
+on:
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+env:
+  JAVA_VERSION: "21"
+
+jobs:
+  integration-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION }}
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
+
+      - name: Force IPv4 (workaround)
+        run: echo "JAVA_TOOL_OPTIONS=-Djava.net.preferIPv4Stack=true" >> $GITHUB_ENV
+
+      - name: Run integration tests
+        run: ./gradlew integrationTest -x spotlessCheck
+
+      - name: Upload integration test report (always)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: batch-integration-test-report
+          path: build/reports/tests/integrationTest

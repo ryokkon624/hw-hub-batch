@@ -35,3 +35,6 @@ out/
 
 ### VS Code ###
 .vscode/
+
+# AI Skills
+CLAUDE_batch.md

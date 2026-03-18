@@ -1,0 +1,17 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+  batch:
+    job:
+      enabled: false
+
+logging:
+  level:
+    root: INFO
+    "[org.springframework]": INFO
+    "[org.springframework.batch]": INFO
+    "[org.flywaydb]": DEBUG
+    "[com.hwhub]": DEBUG
