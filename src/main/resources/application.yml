@@ -7,7 +7,6 @@ spring:
   batch:
     job:
       enabled: false
-    initialize-schema: NEVER  # Flywayで作る想定
 
 mybatis:
   mapper-locations: classpath*:mapper/**/*.xml
@@ -17,6 +16,6 @@ mybatis:
 
 logging:
   level:
-    com.hwhub.batch: INFO
-    org.springframework.batch: INFO
-    org.mybatis: INFO
+    "[com.hwhub.batch]": INFO
+    "[org.springframework.batch]": INFO
+    "[org.mybatis]": INFO
