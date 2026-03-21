@@ -38,3 +38,6 @@ out/
 
 # AI Skills
 CLAUDE_batch.md
+
+# Local environment variables
+.env

@@ -1,0 +1,64 @@
+{
+  "properties": [
+    {
+      "name": "mybatis.mapper-locations",
+      "type": "java.lang.String"
+    },
+    {
+      "name": "mybatis.type-aliases-package",
+      "type": "java.lang.String"
+    },
+    {
+      "name": "mybatis.configuration.map-underscore-to-camel-case",
+      "type": "java.lang.Boolean"
+    },
+    {
+      "name": "hwhub.ai.claude.api-key",
+      "type": "java.lang.String"
+    },
+    {
+      "name": "hwhub.ai.claude.model",
+      "type": "java.lang.String"
+    },
+    {
+      "name": "hwhub.ai.claude.max-tokens",
+      "type": "java.lang.Integer"
+    },
+    {
+      "name": "hwhub.ai.claude.system-prompt",
+      "type": "java.lang.String"
+    },
+    {
+      "name": "hwhub.ai.inquiry-reply.batch-size",
+      "type": "java.lang.Integer"
+    },
+    {
+      "name": "hwhub.knowledge.s3.bucket",
+      "type": "java.lang.String"
+    },
+    {
+      "name": "hwhub.knowledge.s3.faq-key",
+      "type": "java.lang.String"
+    },
+    {
+      "name": "hwhub.knowledge.s3.howto-key",
+      "type": "java.lang.String"
+    },
+    {
+      "name": "cloud.aws.s3.endpoint",
+      "type": "java.lang.String"
+    },
+    {
+      "name": "cloud.aws.credentials.access-key",
+      "type": "java.lang.String"
+    },
+    {
+      "name": "cloud.aws.credentials.secret-key",
+      "type": "java.lang.String"
+    },
+    {
+      "name": "cloud.aws.region.static",
+      "type": "java.lang.String"
+    }
+  ]
+}
