@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hwhub.batch.infrastructure.mybatis.custom.mapper.InquiryCustomMapper">
+
+    <resultMap id="InquiryWithMessagesMap"
+               type="com.hwhub.batch.infrastructure.mybatis.custom.entity.InquiryWithMessagesEntity">
+        <id     property="inquiryId"  column="inquiry_id"/>
+        <result property="userId"     column="user_id"/>
+        <result property="title"      column="title"/>
+        <result property="status"     column="status"/>
+        <result property="userLocale" column="user_locale"/>
+        <collection property="messages"
+                    ofType="com.hwhub.batch.infrastructure.mybatis.generated.entity.TInquiryMessage"
+                    columnPrefix="msg_">
+            <id     property="messageId"  column="message_id"/>
+            <result property="inquiryId"  column="inquiry_id"/>
+            <result property="seq"        column="seq"/>
+            <result property="senderType" column="sender_type"/>
+            <result property="body"       column="body"/>
+        </collection>
+    </resultMap>
+
+    <!-- OPEN（status='00'）を created_at ASC で limit 件、messages も LEFT JOIN で一括取得 -->
+    <select id="findOpenList" resultMap="InquiryWithMessagesMap">
+        SELECT
+            i.inquiry_id
+            , i.user_id
+            , i.title
+            , i.`status`
+            , u.locale      AS user_locale
+            , m.message_id  AS msg_message_id
+            , m.inquiry_id  AS msg_inquiry_id
+            , m.seq         AS msg_seq
+            , m.sender_type AS msg_sender_type
+            , m.body        AS msg_body
+        FROM (
+            SELECT inquiry_id, user_id, title, `status`, created_at
+            FROM t_inquiry
+            WHERE `status` = '00'
+            ORDER BY created_at ASC
+            LIMIT #{limit}
+        ) i
+        INNER JOIN m_user u ON i.user_id = u.user_id
+        LEFT JOIN t_inquiry_message m ON i.inquiry_id = m.inquiry_id
+        ORDER BY i.created_at ASC, m.seq ASC
+    </select>
+
+    <!-- メッセージ追加 -->
+    <insert id="insertMessage">
+        INSERT INTO t_inquiry_message (
+            inquiry_id, seq, sender_type, body,
+            create_user_id, create_program, created_at,
+            update_user_id, update_program, updated_at
+        ) VALUES (
+            #{message.inquiryId.value}, #{message.seq}, #{message.senderType.code}, #{message.body},
+            #{operatorUserId}, #{program}, NOW(6),
+            #{operatorUserId}, #{program}, NOW(6)
+        )
+    </insert>
+
+    <!-- ステータス更新 -->
+    <update id="updateStatus">
+        UPDATE t_inquiry
+        SET status         = #{status},
+            update_user_id = #{operatorUserId},
+            update_program = #{program},
+            updated_at     = NOW(6)
+        WHERE inquiry_id = #{inquiryId}
+    </update>
+
+</mapper>

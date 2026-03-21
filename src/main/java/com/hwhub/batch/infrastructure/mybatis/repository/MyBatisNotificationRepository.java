@@ -5,6 +5,7 @@ import com.hwhub.batch.domain.repository.NotificationRepository;
 import com.hwhub.batch.infrastructure.mybatis.converter.NotificationConverter;
 import com.hwhub.batch.infrastructure.mybatis.custom.mapper.NotificationCustomMapper;
 import com.hwhub.batch.infrastructure.mybatis.generated.entity.TNotification;
+import com.hwhub.batch.infrastructure.mybatis.generated.mapper.TNotificationMapper;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Repository;
 @RequiredArgsConstructor
 public class MyBatisNotificationRepository implements NotificationRepository {
 
+  private final TNotificationMapper notificationMapper;
   private final NotificationCustomMapper customMapper;
   private final NotificationConverter converter;
 
@@ -28,5 +30,15 @@ public class MyBatisNotificationRepository implements NotificationRepository {
         });
 
     return customMapper.bulkInsert(entities);
+  }
+
+  @Override
+  public void insert(NotificationModel model, Long userId, String program) {
+    TNotification entity = converter.toEntity(model);
+    entity.setCreateUserId(userId);
+    entity.setCreateProgram(program);
+    entity.setUpdateUserId(userId);
+    entity.setUpdateProgram(program);
+    notificationMapper.insertSelective(entity);
   }
 }

@@ -14,6 +14,24 @@ mybatis:
   configuration:
     map-underscore-to-camel-case: true
 
+hwhub:
+  ai:
+    claude:
+      api-key: ${CLAUDE_API_KEY}
+      model: claude-sonnet-4-20250514
+      max-tokens: 1000
+      system-prompt: |
+        あなたは「Housework Hub（HwHub）」というアプリのサポートAIです。
+        ユーザーからの問い合わせに対して、提供されたナレッジベースをもとに丁寧かつ簡潔に回答してください。
+        ナレッジに回答がない場合は「担当スタッフに確認します」と回答してください。
+    inquiry-reply:
+      batch-size: 100
+  knowledge:
+    s3:
+      bucket: ${KNOWLEDGE_S3_BUCKET}
+      faq-key: faq.md
+      howto-key: howto.md
+
 logging:
   level:
     "[com.hwhub.batch]": INFO

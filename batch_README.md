@@ -26,8 +26,12 @@ flowchart LR
     Scheduler["EventBridge Scheduler"]
     ECSBatch["ECS (Batch Task)"]
     RDS["RDS (MySQL)"]
+    S3Knowledge["S3 (Knowledge)"]
+    ClaudeAPI["Claude API"]
     Scheduler --> ECSBatch
     ECSBatch --> RDS
+    ECSBatch --> S3Knowledge
+    ECSBatch --> ClaudeAPI
 ```
 
 ---
@@ -44,15 +48,17 @@ src/main/java/com/hwhub/batch
 │   ├── model/             # ドメインモデル
 │   └── repository/        # リポジトリIF
 └── infrastructure/        # 外部接続実装（DB, S3等）
-    └── mybatis/
-        ├── converter/     # Entity ⇔ Domain Modelの変換
-        ├── generated/     # MBG自動生成（※編集禁止）
-        │   ├── entity/
-        │   └── mapper/
-        ├── custom/        # 手書きEntity/Mapper（JOIN用など）
-        │   ├── entity/
-        │   └── mapper/
-        └── repository/    # リポジトリ実装
+    ├── ai/                # AI関連実装
+    ├── mybatis/
+    │   ├── converter/     # Entity ⇔ Domain Modelの変換
+    │   ├── generated/     # MBG自動生成（※編集禁止）
+    │   │   ├── entity/
+    │   │   └── mapper/
+    │   ├── custom/        # 手書きEntity/Mapper（JOIN用など）
+    │   │   ├── entity/
+    │   │   └── mapper/
+    │   └── repository/    # リポジトリ実装
+    └── s3/                # AWS S3操作実装
 ```
 
 構成方針は **バックエンドと同一思想（DDD + レイヤード）** です。
@@ -79,6 +85,7 @@ src/main/java/com/hwhub/batch
 ./gradlew bootRun --args='--spring.batch.job.name=houseworkTaskRecalcJob'
 ./gradlew bootRun --args='--spring.batch.job.name=householdCleanupJob'
 ./gradlew bootRun --args='--spring.batch.job.name=notificationAggregationJob'
+./gradlew bootRun --args='--spring.batch.job.name=inquiryAiReplyJob'
 ```
 
 ---`
@@ -90,6 +97,23 @@ src/main/java/com/hwhub/batch
 - houseworkTaskRecalcJob：家事タスクの再計算
 - householdCleanupJob：世帯の削除
 - notificationAggregationJob：通知イベントの集約
+- inquiryAiReplyJob：問い合わせへのAI自動返信
+
+---
+
+## 環境変数
+
+実際の値は STG/本番では Secrets Manager から供給します。
+
+| 変数名 | 説明 | ローカル設定箇所 |
+|--------|------|-----------------|
+| SPRING_DATASOURCE_URL | DB接続URL | application-dev.yml |
+| SPRING_DATASOURCE_USERNAME | DBユーザー名 | application-dev.yml |
+| SPRING_DATASOURCE_PASSWORD | DBパスワード | application-dev.yml |
+| CLAUDE_API_KEY | Anthropic Claude API Key | .env |
+| KNOWLEDGE_S3_BUCKET | ナレッジS3バケット名 | .env |
+
+ローカル開発用の `.env` ファイルは `.env.example` をコピーして作成してください。
 
 ---
 
