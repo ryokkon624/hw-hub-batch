@@ -21,7 +21,6 @@ public class MyBatisConfig {
     SqlSessionFactoryBean factoryBean = new SqlSessionFactoryBean();
     factoryBean.setDataSource(dataSource);
 
-    // ★ XML の配置場所に合わせる
     factoryBean.setMapperLocations(
         new PathMatchingResourcePatternResolver().getResources("classpath*:mapper/**/*.xml"));
     return factoryBean.getObject();
