@@ -17,7 +17,7 @@ public class EnumGenerator {
   private static final String JDBC_USER = "hwhub";
   private static final String JDBC_PASSWORD = "hwhub";
 
-  // 出力先パス（backend/src/main/java からの絶対 or 相対パスに調整）
+  // 出力先パス
   private static final Path OUTPUT_DIR = Path.of("src/main/java/com/hwhub/batch/domain/enums");
 
   private static final String PACKAGE_NAME = "com.hwhub.batch.domain.enums";
@@ -28,7 +28,7 @@ public class EnumGenerator {
       System.out.println("Enum generation finished successfully.");
     } catch (Exception e) {
       System.err.println("Enum generation failed:");
-      e.printStackTrace(); // ★ これで本当の原因がコンソールに出る
+      e.printStackTrace();
       System.exit(1);
     }
   }
@@ -61,10 +61,10 @@ public class EnumGenerator {
   private Map<String, String> loadCodeTypes(Connection conn) throws SQLException {
     String sql =
         """
-                SELECT DISTINCT code_type, code_type_name_en
-                FROM m_code
-                ORDER BY code_type
-                """;
+        SELECT DISTINCT code_type, code_type_name_en
+        FROM m_code
+        ORDER BY code_type
+        """;
 
     Map<String, String> result = new LinkedHashMap<>();
     try (PreparedStatement ps = conn.prepareStatement(sql);
@@ -79,15 +79,15 @@ public class EnumGenerator {
     return result;
   }
 
-  /** 1 code_type の全コードを display_order → code_value で取得 */
+  /** code_type の全コードを display_order → code_value で取得 */
   private List<CodeRow> loadCodesByType(Connection conn, String codeType) throws SQLException {
     String sql =
         """
-                SELECT code_value, display_name_en
-                FROM m_code
-                WHERE code_type = ?
-                ORDER BY display_order, code_value
-                """;
+        SELECT code_value, display_name_en
+        FROM m_code
+        WHERE code_type = ?
+        ORDER BY display_order, code_value
+        """;
 
     List<CodeRow> rows = new ArrayList<>();
     try (PreparedStatement ps = conn.prepareStatement(sql)) {
