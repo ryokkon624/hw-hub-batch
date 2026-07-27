@@ -54,9 +54,8 @@ public class HouseworkTaskRecalcService {
         requests.stream()
             .collect(
                 Collectors.groupingBy(
-                    HouseworkTaskRecalcRequest::houseworkId,
-                    Collectors.mapping(
-                        HouseworkTaskRecalcRequest::requestId, Collectors.toList())));
+                    r -> r.houseworkId(),
+                    Collectors.mapping(r -> r.requestId(), Collectors.toList())));
 
     int totalAffected = 0;
     for (Map.Entry<Long, List<Long>> entry : houseworkId2RequestIds.entrySet()) {

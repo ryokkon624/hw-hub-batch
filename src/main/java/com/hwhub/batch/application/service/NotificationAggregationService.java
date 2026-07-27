@@ -4,8 +4,6 @@ import com.hwhub.batch.domain.enums.NotificationLinkType;
 import com.hwhub.batch.domain.enums.NotificationType;
 import com.hwhub.batch.domain.enums.ProgramType;
 import com.hwhub.batch.domain.model.HouseholdMemberModel;
-import com.hwhub.batch.domain.model.HouseholdModel;
-import com.hwhub.batch.domain.model.UserModel;
 import com.hwhub.batch.domain.model.notification.NotificationLink;
 import com.hwhub.batch.domain.model.notification.NotificationMessage;
 import com.hwhub.batch.domain.model.notification.NotificationModel;
@@ -131,13 +129,12 @@ public class NotificationAggregationService {
    * @return おうち名のマップ
    */
   private Map<Long, String> buildHouseholdNameMap(List<NotificationModel> rows) {
-    List<Long> householdIds =
-        rows.stream().map(NotificationModel::getHouseholdId).distinct().toList();
+    List<Long> householdIds = rows.stream().map(m -> m.getHouseholdId()).distinct().toList();
     if (householdIds.isEmpty()) {
       return Map.of();
     }
     return householdRepository.findByIds(householdIds).stream()
-        .collect(Collectors.toMap(HouseholdModel::getHouseholdId, HouseholdModel::getName));
+        .collect(Collectors.toMap(h -> h.getHouseholdId(), h -> h.getName()));
   }
 
   /**
@@ -184,15 +181,13 @@ public class NotificationAggregationService {
     }
 
     // 世帯IDを無視してユーザIDでまとめる
-    List<Long> missingUserIds =
-        missingPairs.stream().map(HouseholdUserPair::userId).distinct().toList();
+    List<Long> missingUserIds = missingPairs.stream().map(p -> p.userId()).distinct().toList();
 
     // ユーザ情報を取得しユーザID、表示名のMap生成
     Map<Long, String> userNameMap =
         userRepository.findByIds(missingUserIds).stream()
             .filter(u -> u.getDisplayName() != null && !u.getDisplayName().isBlank())
-            .collect(
-                Collectors.toMap(UserModel::getUserId, UserModel::getDisplayName, (a, b) -> a));
+            .collect(Collectors.toMap(u -> u.getUserId(), u -> u.getDisplayName(), (a, b) -> a));
     for (HouseholdUserPair p : missingPairs) {
       String name = userNameMap.get(p.userId());
       if (name != null) {
